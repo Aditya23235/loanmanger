@@ -17,7 +17,7 @@ export function Footer() {
     return (
         <footer className="mt-24 border-t border-slate-200 bg-white/50 backdrop-blur-xl">
             <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-                <div className="grid gap-12 lg:grid-cols-4">
+                <div className="grid gap-12 lg:grid-cols-3">
                     {/* Brand Section */}
                     <div className="space-y-8">
                         <div className="flex items-center gap-3">
@@ -94,36 +94,7 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Get in Touch */}
-                    <div>
-                        <h4 className="mb-8 font-display text-lg font-bold text-slate-900">Get in Touch</h4>
-                        <ul className="space-y-6">
-                            <li className="flex gap-4">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-primary">
-                                    <MapPin className="h-5 w-5" />
-                                </div>
-                                <p className="text-sm font-medium leading-relaxed text-slate-600">
-                                    G01, G02, The Chambers, Viman Nagar, Pune - 411014
-                                </p>
-                            </li>
-                            <li className="flex gap-4">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-primary">
-                                    <Phone className="h-5 w-5" />
-                                </div>
-                                <p className="text-sm font-bold text-slate-900">
-                                    8265092614
-                                </p>
-                            </li>
-                            <li className="flex gap-4">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-primary">
-                                    <Mail className="h-5 w-5" />
-                                </div>
-                                <p className="text-sm font-bold text-slate-900">
-                                    info@loanflow.com
-                                </p>
-                            </li>
-                        </ul>
-                    </div>
+
                 </div>
 
                 <div className="mt-16 flex flex-col items-center justify-between border-t border-slate-200 pt-8 md:flex-row">
