@@ -10,7 +10,6 @@ import { useState, useEffect } from "react";
 const navItems = [
   { label: "Apply", href: "/", icon: FileText },
   { label: "Calculator", href: "/calculator", icon: Calculator },
-  { label: "Status", href: "/status", icon: CreditCard },
   { label: "Staff Menu", href: "/staff", icon: LayoutDashboard },
   { label: "Admin Dashboard", href: "/admin", icon: Shield },
 ];
@@ -58,7 +57,7 @@ export function CustomerNav() {
           {navItems
             .filter((item) => {
               if (user?.role === "admin") return true; // Admin sees everything
-              if (item.label === "Apply" || item.label === "Status" || item.label === "Calculator") return true; // Customers & Guests see these
+              if (item.label === "Apply" || item.label === "Calculator") return true; // Customers & Guests see these
               if (user?.role === "staff" && item.label === "Staff Menu") return true; // Staff sees staff menu
               return false;
             })
