@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -66,6 +66,13 @@ function calculateEligibility(data: LoanFormValues): EligibilityResult {
 export default function Page() {
     const router = useRouter();
     const [result, setResult] = useState<EligibilityResult | null>(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+            router.push("/login");
+        }
+    }, [router]);
 
     const exportSchedule = () => {
         if (!result) return;
