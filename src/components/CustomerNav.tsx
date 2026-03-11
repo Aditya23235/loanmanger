@@ -86,7 +86,7 @@ export function CustomerNav() {
               <div className="mx-2 h-6 w-[1px] bg-slate-200 hidden md:block" />
               <div className="flex flex-col items-end hidden sm:flex">
                 <span className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60 leading-none">Logged in as</span>
-                <span className="text-sm font-bold text-slate-700">{user.fullName.split(' ')[0]}</span>
+                <span className="text-sm font-bold text-slate-700">{user.fullName?.split(' ')[0] || 'User'}</span>
               </div>
               <button
                 onClick={logout}
