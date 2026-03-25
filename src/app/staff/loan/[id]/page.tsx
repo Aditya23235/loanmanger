@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RiskBadge } from "@/components/RiskBadge";
+
 import { StatusBadge } from "@/components/StatusBadge";
-import { ArrowLeft, CheckCircle2, FileText, RefreshCw, XCircle, User, Briefcase, TrendingUp, ShieldCheck, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText, RefreshCw, User, Briefcase, TrendingUp, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -48,8 +48,9 @@ export default function LoanDetails() {
     if (!app) {
         return (
             <div className="container py-20 text-center animate-fade-in">
-                <p className="text-xl font-bold text-muted-foreground">Application not found</p>
-                <Button asChild variant="outline" className="mt-6 rounded-xl">
+                <p className="text-xl font-bold text-muted-foreground">Application not found (Searching ID: {id})</p>
+                <div className="mt-2 text-sm text-muted-foreground italic">Check if the ID in the URL matches a record in your database.</div>
+                <Button asChild variant="outline" className="mt-8 rounded-xl">
                     <Link href="/staff"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard</Link>
                 </Button>
             </div>
@@ -74,64 +75,58 @@ export default function LoanDetails() {
                         Application: {app.applicantId} · Submitted {new Date(app.createdAt).toLocaleDateString()}
                     </p>
                 </div>
-                <div className="flex gap-3">
-                    <Button variant="outline" className="h-12 rounded-xl border-destructive/20 text-destructive font-bold hover:bg-destructive/10" onClick={() => toast.error("Application rejected")}>
-                        <XCircle className="mr-2 h-4 w-4" /> Reject
-                    </Button>
-                    <Button className="h-12 rounded-xl bg-success px-8 font-bold text-white shadow-xl shadow-success/20 hover:scale-105 transition-all" onClick={() => toast.success("Application approved")}>
-                        <CheckCircle2 className="mr-2 h-4 w-4" /> Approve Case
-                    </Button>
-                </div>
+
             </div>
 
+            {/* Case Overview Summary */}
+            <Card className="mb-10 glass border-primary/20 shadow-xl overflow-hidden">
+                <CardHeader className="bg-primary/5 p-6 border-b border-primary/10">
+                    <CardTitle className="font-display text-xl font-bold flex items-center gap-2 text-primary">
+                        <FileText className="h-5 w-5" /> Case Overview Summary
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8">
+                    <p className="text-lg leading-relaxed text-slate-700 font-medium">
+                        Applicant <span className="text-primary font-bold">{app.fullName}</span>, a <span className="font-bold">{app.employmentType}</span> professional with a monthly income of <span className="font-bold text-slate-900">₹{app.monthlyIncome?.toLocaleString("en-IN")}</span>, has submitted a request for a <span className="font-bold text-slate-900">₹{app.loanAmountRequested?.toLocaleString("en-IN")}</span> loan over a tenure of <span className="font-bold">{app.tenure} months</span>. The system has calculated an eligibility amount of <span className="font-bold text-primary">₹{app.eligibleLoanAmount?.toLocaleString("en-IN")}</span> based on the provided financial profile.
+                    </p>
+                </CardContent>
+            </Card>
+
             <div className="grid gap-8 md:grid-cols-2">
-                {/* Personal Details */}
-                <Card className="glass border-white/20 shadow-2xl overflow-hidden">
+                {/* FULL APPLICANT PROFILE */}
+                <Card className="glass border-white/20 shadow-2xl overflow-hidden md:col-span-2">
                     <CardHeader className="bg-primary/5 border-b border-primary/10">
-                        <CardTitle className="font-display text-xl font-bold flex items-center gap-2">
-                            <User className="h-5 w-5 text-primary" /> Personal Information
+                        <CardTitle className="font-display text-2xl font-black flex items-center gap-3">
+                            <User className="h-6 w-6 text-primary" /> FULL APPLICANT PROFILE
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8 space-y-4">
+                    <CardContent className="p-8 grid gap-x-12 gap-y-6 sm:grid-cols-2">
                         <DetailRow label="Full Name" value={app.fullName} />
-                        <DetailRow label="Aadhaar ID" value={app.aadhaarNumber.replace(/(\d{4})/g, "$1 ").trim()} />
+                        <DetailRow label="Aadhaar Number" value={app.aadhaarNumber.replace(/(\d{4})/g, "$1 ").trim()} />
                         <DetailRow label="PAN Number" value={app.panNumber} />
-                        <DetailRow label="Employment" value={app.employmentType} />
+                        <DetailRow label="Employment Type" value={app.employmentType} />
+                        <DetailRow label="Monthly Income (₹)" value={`₹${app.monthlyIncome?.toLocaleString("en-IN")}`} />
+                        <DetailRow label="Loan Amount Requested (₹)" value={`₹${app.loanAmountRequested?.toLocaleString("en-IN")}`} isEmphasis />
+                        <DetailRow label="Tenure (months)" value={`${app.tenure} months`} />
+                        <DetailRow label="Eligible Amount (₹)" value={`₹${app.eligibleLoanAmount?.toLocaleString("en-IN")}`} isEmphasis />
                     </CardContent>
                 </Card>
 
-                {/* Financial Details */}
+                {/* Additional Information */}
                 <Card className="glass border-white/20 shadow-2xl overflow-hidden">
                     <CardHeader className="bg-accent/5 border-b border-accent/10">
                         <CardTitle className="font-display text-xl font-bold flex items-center gap-2">
-                            <Briefcase className="h-5 w-5 text-accent" /> Financial Profile
+                            <Briefcase className="h-5 w-5 text-accent" /> Financial & Risk Context
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-8 space-y-4">
-                        <DetailRow label="Monthly Income" value={`₹${app.monthlyIncome.toLocaleString("en-IN")}`} />
-                        <DetailRow label="Existing EMI" value={`₹${app.existingEmi.toLocaleString("en-IN")}`} />
+                        <DetailRow label="Existing EMI" value={`₹${app.existingEmi?.toLocaleString("en-IN")}`} />
                         <DetailRow label="Credit Score" value={String(app.creditScore)} isEmphasis />
-                        <DetailRow label="Loan Request" value={`₹${app.loanAmountRequested.toLocaleString("en-IN")}`} isEmphasis />
-                        <DetailRow label="Tenure" value={`${app.tenure} months`} />
+                        <DetailRow label="Risk Score" value={`${app.riskScore}/100`} />
                     </CardContent>
                 </Card>
 
-                {/* Risk Discovery */}
-                <Card className="glass border-white/20 shadow-2xl overflow-hidden">
-                    <CardHeader className="bg-amber-500/5 border-b border-amber-500/10">
-                        <CardTitle className="font-display text-xl font-bold flex items-center gap-2">
-                            <ShieldCheck className="h-5 w-5 text-amber-500" /> Risk Assessment
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8 space-y-4">
-                        <DetailRow label="Eligible Amount" value={`₹${app.eligibleLoanAmount.toLocaleString("en-IN")}`} />
-                        <DetailRow label="Risk Score" value={`${app.riskScore}/100`} />
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground/70">Calculated Risk</span>
-                            <RiskBadge level={app.riskLevel} />
-                        </div>
-                    </CardContent>
-                </Card>
+
 
                 {/* Documents */}
                 <Card className="glass border-white/20 shadow-2xl overflow-hidden">
@@ -173,6 +168,21 @@ export default function LoanDetails() {
                         <Button variant="ghost" className="w-full h-12 rounded-xl border border-dashed border-muted-foreground/20 font-bold text-muted-foreground hover:bg-white/40" onClick={() => toast.info("Re-upload requested")}>
                             <RefreshCw className="mr-2 h-4 w-4" /> Request Document Re-upload
                         </Button>
+                    </CardContent>
+                </Card>
+
+                {/* Application Metadata */}
+                <Card className="glass border-white/20 shadow-2xl overflow-hidden">
+                    <CardHeader className="bg-slate-500/5 border-b border-slate-500/10">
+                        <CardTitle className="font-display text-xl font-bold flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5 text-slate-500" /> Application Data
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-8 space-y-4">
+                        <DetailRow label="System Email" value={app.userEmail || "Not Provided"} />
+                        <DetailRow label="Internal UID" value={app.userId?.slice(-12) || "N/A"} />
+                        <DetailRow label="Last Updated" value={new Date(app.updatedAt).toLocaleString()} />
+                        <DetailRow label="Submission" value={new Date(app.createdAt).toLocaleString()} />
                     </CardContent>
                 </Card>
             </div>

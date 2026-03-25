@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
-import { CheckCircle2, XCircle, FileText, TrendingUp, Users, Calendar, ArrowUpRight, Loader2, Database } from "lucide-react";
+import { CheckCircle2, XCircle, FileText, TrendingUp, Users, Calendar, ArrowUpRight, Loader2 } from "lucide-react";
 
 export default function AdminPanel() {
     const [applications, setApplications] = useState<any[]>([]);
@@ -30,9 +30,6 @@ export default function AdminPanel() {
         total: applications.length,
         approved: applications.filter((a) => a.status === "Approved").length,
         rejected: applications.filter((a) => a.status === "Rejected").length,
-        avgRisk: applications.length > 0
-            ? Math.round(applications.reduce((s, a) => s + (a.riskScore || 0), 0) / applications.length)
-            : 0,
     };
 
     const statusCounts = ["Submitted", "Under Review", "Approved", "Rejected"].map(
@@ -42,11 +39,7 @@ export default function AdminPanel() {
         })
     );
 
-    const riskCounts = [
-        { name: "Low Risk", value: applications.filter(a => (a.riskScore || 0) <= 30).length, color: "hsl(142, 71%, 45%)" },
-        { name: "Med Risk", value: applications.filter(a => (a.riskScore || 0) > 30 && (a.riskScore || 0) <= 60).length, color: "hsl(38, 92%, 50%)" },
-        { name: "High Risk", value: applications.filter(a => (a.riskScore || 0) > 60).length, color: "hsl(0, 84%, 60%)" },
-    ];
+
 
     const barColors = ["hsl(210, 80%, 52%)", "hsl(38, 92%, 50%)", "hsl(142, 71%, 45%)", "hsl(0, 84%, 60%)"];
 
@@ -54,7 +47,6 @@ export default function AdminPanel() {
         { label: "Total Applications", value: stats.total, icon: FileText, color: "text-blue-500", bg: "bg-blue-500/10" },
         { label: "Approved", value: stats.approved, icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-500/10" },
         { label: "Rejected", value: stats.rejected, icon: XCircle, color: "text-rose-500", bg: "bg-rose-500/10" },
-        { label: "Avg Risk Index", value: stats.avgRisk, icon: TrendingUp, color: "text-amber-500", bg: "bg-amber-500/10" },
     ];
 
     if (isLoading) {
@@ -75,13 +67,10 @@ export default function AdminPanel() {
                     <h1 className="font-display text-4xl font-extrabold tracking-tight">Admin Console</h1>
                     <p className="text-muted-foreground">Managing {stats.total} live application records from MongoDB.</p>
                 </div>
-                <div className="flex items-center gap-3 rounded-2xl bg-primary px-5 py-2.5 text-white shadow-lg shadow-primary/20">
-                    <Database className="h-4 w-4" />
-                    <span className="text-sm font-bold uppercase tracking-widest">PostgreSQL Active</span>
-                </div>
+
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-10">
                 {analyticsCards.map((card) => (
                     <Card key={card.label} className="glass border-white/20 group hover:shadow-2xl transition-all duration-500">
                         <CardContent className="p-8">
@@ -99,7 +88,7 @@ export default function AdminPanel() {
 
             <div className="grid gap-8 lg:grid-cols-3 mb-10">
                 {/* Status Distribution */}
-                <Card className="glass lg:col-span-2 border-white/20 shadow-2xl">
+                <Card className="glass lg:col-span-3 border-white/20 shadow-2xl">
                     <CardHeader className="p-8 border-b border-white/10">
                         <CardTitle className="font-display text-2xl font-bold">Applications by Status</CardTitle>
                     </CardHeader>
@@ -122,32 +111,7 @@ export default function AdminPanel() {
                     </CardContent>
                 </Card>
 
-                {/* Risk Profile */}
-                <Card className="glass border-white/20 shadow-2xl">
-                    <CardHeader className="p-8 border-b border-white/10">
-                        <CardTitle className="font-display text-2xl font-bold">Risk Portfolio</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8">
-                        <div className="h-[250px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={riskCounts} innerRadius={60} outerRadius={90} paddingAngle={8} dataKey="value">
-                                        {riskCounts.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                                    </Pie>
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <div className="mt-8 space-y-4">
-                            {riskCounts.map((item) => (
-                                <div key={item.name} className="flex items-center justify-between p-3 rounded-xl bg-white/40 border border-white/20">
-                                    <span className="text-sm font-bold">{item.name}</span>
-                                    <span className="font-black">{item.value}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
+
             </div>
 
             {/* List Table */}
@@ -165,7 +129,7 @@ export default function AdminPanel() {
                                 <tr>
                                     <th className="px-8 py-4">Full Name</th>
                                     <th className="px-8 py-4">Loan Amount</th>
-                                    <th className="px-8 py-4">Risk Level</th>
+
                                     <th className="px-8 py-4">Status</th>
                                     <th className="px-8 py-4 text-right">View</th>
                                 </tr>
@@ -181,13 +145,7 @@ export default function AdminPanel() {
                                             <p className="font-black text-slate-900">₹{app.loanAmountRequested?.toLocaleString()}</p>
                                             <p className="text-xs text-muted-foreground">{app.tenure} Months</p>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${(app.riskScore || 0) <= 30 ? 'bg-emerald-100 text-emerald-700' :
-                                                (app.riskScore || 0) <= 60 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
-                                                }`}>
-                                                {app.riskLevel || 'N/A'} ({(app.riskScore || 0)})
-                                            </div>
-                                        </td>
+
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-2">
                                                 <div className={`h-2 w-2 rounded-full ${app.status === 'Approved' ? 'bg-emerald-500' :

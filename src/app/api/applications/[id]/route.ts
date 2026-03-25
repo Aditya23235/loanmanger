@@ -8,7 +8,7 @@ export async function GET(
 ) {
     try {
         await connectToDatabase();
-        const { id } = params;
+        const { id } = await params;
 
         // Try searching by _id first if it looks like a valid ObjectId
         let application = null;

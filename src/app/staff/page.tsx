@@ -6,9 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { RiskBadge } from "@/components/RiskBadge";
-import { StatusBadge } from "@/components/StatusBadge";
-import { Eye, Filter, Plus, Download, Search, Loader2, Database } from "lucide-react";
+
+import { Eye, Filter, Plus, Download, Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { exportToExcel } from "@/lib/excel-utils";
 
@@ -16,7 +15,7 @@ export default function StaffDashboard() {
     const [applications, setApplications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [riskFilter, setRiskFilter] = useState<string>("all");
+
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
@@ -38,16 +37,14 @@ export default function StaffDashboard() {
 
     const filtered = applications.filter((app) => {
         const matchesStatus = statusFilter === "all" || app.status === statusFilter;
-        const matchesRisk = riskFilter === "all" || app.riskLevel === riskFilter;
         const matchesSearch = !searchQuery ||
             app.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (app._id && app._id.toLowerCase().includes(searchQuery.toLowerCase()));
-        return matchesStatus && matchesRisk && matchesSearch;
+        return matchesStatus && matchesSearch;
     });
 
     const stats = {
         pending: applications.filter(a => a.status === "Submitted" || a.status === "Under Review").length,
-        highRisk: applications.filter(a => a.riskLevel === "High").length,
         approved: applications.filter(a => a.status === "Approved").length,
         total: applications.length
     };
@@ -60,8 +57,6 @@ export default function StaffDashboard() {
             "Monthly Income": app.monthlyIncome,
             "Loan Requested": app.loanAmountRequested,
             "Tenure": app.tenure,
-            "Risk Score": app.riskScore,
-            "Risk Level": app.riskLevel,
             "Status": app.status
         }));
         exportToExcel(data, "Loan_Applications_Registry", "Applications");
@@ -93,19 +88,15 @@ export default function StaffDashboard() {
                     >
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
-                    <div className="flex items-center gap-2 rounded-xl bg-primary px-5 text-white shadow-xl shadow-primary/20">
-                        <Database className="h-4 w-4" />
-                        <span className="text-sm font-bold uppercase tracking-widest">Live Sync</span>
-                    </div>
+
                 </div>
             </div >
 
             {/* Stats Overview */}
-            < div className="mb-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" >
+            < div className="mb-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" >
                 {
                     [
                         { label: "Pending Review", count: stats.pending, color: "bg-amber-500" },
-                        { label: "High Risk", count: stats.highRisk, color: "bg-rose-500" },
                         { label: "Approved Overall", count: stats.approved, color: "bg-emerald-500" },
                         { label: "Total Active", count: stats.total, color: "bg-primary" },
                     ].map((stat) => (
@@ -138,27 +129,8 @@ export default function StaffDashboard() {
                                     className="h-11 pl-9 bg-white/50 rounded-xl border-white/30"
                                 />
                             </div>
-                            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="h-11 w-[150px] bg-white/50 rounded-xl border-white/30 font-semibold"><SelectValue placeholder="Status" /></SelectTrigger>
-                                <SelectContent className="rounded-xl border-white/30 backdrop-blur-xl">
-                                    <SelectItem value="all">All Statuses</SelectItem>
-                                    <SelectItem value="Submitted">Submitted</SelectItem>
-                                    <SelectItem value="Under Review">Under Review</SelectItem>
-                                    <SelectItem value="Documents Pending">Pending Docs</SelectItem>
-                                    <SelectItem value="Risk Assessed">Assessed</SelectItem>
-                                    <SelectItem value="Approved">Approved</SelectItem>
-                                    <SelectItem value="Rejected">Rejected</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Select value={riskFilter} onValueChange={setRiskFilter}>
-                                <SelectTrigger className="h-11 w-[140px] bg-white/50 rounded-xl border-white/30 font-semibold"><SelectValue placeholder="Risk" /></SelectTrigger>
-                                <SelectContent className="rounded-xl border-white/30 backdrop-blur-xl">
-                                    <SelectItem value="all">All Risks</SelectItem>
-                                    <SelectItem value="Low">Low Risk</SelectItem>
-                                    <SelectItem value="Medium">Medium Risk</SelectItem>
-                                    <SelectItem value="High">High Risk</SelectItem>
-                                </SelectContent>
-                            </Select>
+
+
                         </div>
                     </div>
                 </CardHeader>
@@ -170,8 +142,8 @@ export default function StaffDashboard() {
                                     <TableHead className="py-5 font-bold text-muted-foreground pl-8">Applicant Profile</TableHead>
                                     <TableHead className="font-bold text-muted-foreground text-right">Income</TableHead>
                                     <TableHead className="font-bold text-muted-foreground text-right">Requested</TableHead>
-                                    <TableHead className="font-bold text-muted-foreground text-center">Risk Level</TableHead>
-                                    <TableHead className="font-bold text-muted-foreground text-center">Status</TableHead>
+
+
                                     <TableHead className="font-bold text-muted-foreground text-center pr-8">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -181,16 +153,16 @@ export default function StaffDashboard() {
                                         <TableCell className="py-6 pl-8">
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-base tracking-tight">{app.fullName}</span>
-                                                <span className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-widest">ID: {app._id?.slice(-8)}</span>
+                                                 <span className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-widest">ID: {app.applicantId || app._id?.slice(-8)}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right font-semibold">₹{app.monthlyIncome?.toLocaleString("en-IN")}</TableCell>
                                         <TableCell className="text-right font-bold text-primary">₹{app.loanAmountRequested?.toLocaleString("en-IN")}</TableCell>
-                                        <TableCell className="text-center"><RiskBadge level={app.riskLevel || 'Low'} /></TableCell>
-                                        <TableCell className="text-center"><StatusBadge status={app.status || 'Pending'} /></TableCell>
+
+
                                         <TableCell className="text-center pr-8">
                                             <Button variant="ghost" size="sm" asChild className="h-10 w-10 p-0 rounded-xl hover:bg-primary hover:text-white transition-all">
-                                                <Link href={`/staff/loan/${app._id}`}><Eye className="h-5 w-5" /></Link>
+                                                 <Link href={`/staff/loan/${app._id}`}><Eye className="h-5 w-5" /></Link>
                                             </Button>
                                         </TableCell>
                                     </TableRow>

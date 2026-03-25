@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { RiskBadge } from "@/components/RiskBadge";
+
 import { toast } from "sonner";
 import { format, addMonths } from "date-fns";
 import { exportToExcel } from "@/lib/excel-utils";
@@ -40,8 +40,6 @@ type LoanFormValues = z.infer<typeof loanSchema>;
 
 interface EligibilityResult {
     eligibleAmount: number;
-    riskScore: number;
-    riskLevel: RiskLevel;
 }
 
 function calculateEligibility(data: LoanFormValues): EligibilityResult {
@@ -58,8 +56,6 @@ function calculateEligibility(data: LoanFormValues): EligibilityResult {
 
     return {
         eligibleAmount: Math.max(0, Math.round(eligibleAmount)),
-        riskScore: Math.min(100, riskScore),
-        riskLevel,
     };
 }
 
@@ -165,8 +161,6 @@ export default function Page() {
                 ...data,
                 userId: user.id || user._id, // Support both id formats
                 userEmail: user.email,
-                riskScore: assessment.riskScore,
-                riskLevel: assessment.riskLevel
             };
 
             const response = await fetch("/api/applications", {
@@ -215,7 +209,7 @@ export default function Page() {
                     <Card className="glass overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-primary/5">
                         <CardHeader className="bg-primary/5 border-b border-primary/10">
                             <CardTitle className="font-display text-2xl font-bold">Loan Application Form</CardTitle>
-                            <CardDescription className="text-base">Complete all sections for an accurate risk assessment.</CardDescription>
+                            <CardDescription className="text-base">Complete all sections for an accurate assessment.</CardDescription>
                         </CardHeader>
                         <CardContent className="p-8">
                             <Form {...form}>
@@ -324,18 +318,7 @@ export default function Page() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground/70">Risk Assessment</p>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg">
-                                            <TrendingUp className="h-6 w-6" />
-                                        </div>
-                                        <div>
-                                            <p className="font-display text-2xl font-black">{result.riskScore}/100</p>
-                                            <div className="mt-1"><RiskBadge level={result.riskLevel} /></div>
-                                        </div>
-                                    </div>
-                                </div>
+
 
                                 <div className="pt-6 border-t border-muted-foreground/10 space-y-4">
                                     <Button
@@ -368,7 +351,7 @@ export default function Page() {
                             </li>
                             <li className="flex items-center gap-2">
                                 <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                                Transparent risk profiling
+                                Real-time application tracking
                             </li>
                             <li className="flex items-center gap-2">
                                 <div className="h-1.5 w-1.5 rounded-full bg-white" />
